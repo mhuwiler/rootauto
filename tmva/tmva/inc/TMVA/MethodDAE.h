@@ -36,6 +36,7 @@
 #include "TMVA/DNN/DAE/DenoiseAE.h"
 #include "TMVA/MethodBase.h"
 #include "TString.h"
+#include "TMVA/DNN/DAE/StackedNet.h"
 
 #include "TMVA/DNN/Architectures/Reference.h"
 
@@ -61,20 +62,22 @@ public:
   using Matrix_t = typename Architecture_t::Matrix_t;
 
 private:
-  using LayoutVector_t = std::tuple<>;
+  using LayoutVector_t = std::vector<Int_t>;
   using KeyValueVector_t = std::vector<std::map<TString, TString>>;
 
   struct TTrainingSettings {
     size_t batchSize;
     size_t testInterval;
     size_t convergenceSteps;
-    DNN::ERegularization regularization;
+    //DNN::ERegularization regularization;
     Double_t learningRate;
-    Double_t momentum;
+    //Double_t momentum;
     Double_t weightDecay;
-    Double_t dropoutProbability;
+    Double_t corruption;
     bool multithreading;
   };
+
+  //TSDAE<Architecture_t>* net; 
   EInitialization fWeightInitialization; ///< The initialization method
   EOutputFunction
       fOutputFunction; ///< The output function for making the predictions
@@ -107,6 +110,16 @@ private:
                                    TMatrixT<Double_t> &X);
 
   ClassDef(MethodDAE, 0);
+
+  /*template <typename T>
+  TString fetchValue (const std::map<TString, TString>& keyValueMap, TString key);
+  T MethodDAE::fetchValue(const std::map<TString,TString>& keyValueMap, TString key, T defaultValue);
+  std::vector<double> fetchValue(const std::map<TString, TString> & keyValueMap, TString key, std::vector<double> defaultValue);
+  int fetchValue(const std::map<TString,TString>& keyValueMap, TString key, int defaultValue); 
+  double fetchValue (const std::map<TString,TString>& keyValueMap, TString key, double defaultValue); 
+  TString fetchValue (const std::map<TString,TString>& keyValueMap, TString key, TString defaultValue); 
+  bool fetchValue (const std::map<TString,TString>& keyValueMap, TString key, bool defaultValue); */
+
 
 protected:
   void GetHelpMessage() const;
@@ -144,6 +157,10 @@ public:
 
   // ranking of input variables
   const Ranking *CreateRanking();
+
+  KeyValueVector_t ParseKeyValueString(TString parseString,
+                                      TString blockDelim,
+                                      TString tokenDelim);
 };
 } // namespace TMVA
 

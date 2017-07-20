@@ -47,6 +47,7 @@ Deep Neural Network Implementation.
 #include "TMVA/Tools.h"
 #include "TMVA/Config.h"
 #include "TMVA/Ranking.h"
+#include "TMVA/Parsing.h"
 
 #include "TMVA/DNN/Net.h"
 #include "TMVA/DNN/Architectures/Reference.h"
@@ -66,6 +67,7 @@ ClassImp(TMVA::MethodDNN);
 namespace TMVA
 {
    using namespace DNN;
+   using namespace DNNParsing; 
 
    ////////////////////////////////////////////////////////////////////////////////
    /// standard constructor
@@ -304,107 +306,6 @@ auto TMVA::MethodDNN::ParseKeyValueString(TString parseString,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TString fetchValue (const std::map<TString, TString>& keyValueMap, TString key)
-{
-   key.ToUpper ();
-   std::map<TString, TString>::const_iterator it = keyValueMap.find (key);
-   if (it == keyValueMap.end()) {
-      return TString ("");
-   }
-   return it->second;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-T fetchValue(const std::map<TString,TString>& keyValueMap,
-              TString key,
-              T defaultValue);
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-int fetchValue(const std::map<TString,TString>& keyValueMap,
-               TString key,
-               int defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   return value.Atoi ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-double fetchValue (const std::map<TString,TString>& keyValueMap,
-                   TString key, double defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   return value.Atof ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-TString fetchValue (const std::map<TString,TString>& keyValueMap,
-                    TString key, TString defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   return value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-bool fetchValue (const std::map<TString,TString>& keyValueMap,
-                 TString key, bool defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   value.ToUpper ();
-   if (value == "TRUE" || value == "T" || value == "1") {
-      return true;
-   }
-   return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-std::vector<double> fetchValue(const std::map<TString, TString> & keyValueMap,
-                               TString key,
-                               std::vector<double> defaultValue)
-{
-   TString parseString (fetchValue (keyValueMap, key));
-   if (parseString == "") {
-      return defaultValue;
-   }
-   parseString.ToUpper ();
-   std::vector<double> values;
-
-   const TString tokenDelim ("+");
-   TObjArray* tokenStrings = parseString.Tokenize (tokenDelim);
-   TIter nextToken (tokenStrings);
-   TObjString* tokenString = (TObjString*)nextToken ();
-   for (; tokenString != NULL; tokenString = (TObjString*)nextToken ()) {
-      std::stringstream sstr;
-      double currentValue;
-      sstr << tokenString->GetString ().Data ();
-      sstr >> currentValue;
-      values.push_back (currentValue);
-   }
-   return values;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
