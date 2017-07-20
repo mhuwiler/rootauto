@@ -34,6 +34,7 @@
 
 #include "TMVA/DNN/Architectures/Reference.h"
 #include "TMVA/DNN/Functions.h"
+#include "TMVA/Parsing.h"
 
 #include <iostream>
 
@@ -46,6 +47,7 @@ using TMVA::DNN::EInitialization;
 using TMVA::DNN::EOutputFunction;
 
 namespace TMVA {
+  //using namespace DNNParsing; 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// standard constructor
@@ -377,22 +379,22 @@ void TMVA::MethodDAE::ProcessOptions() {
    for (auto& block : strategyKeyValues) {
       TTrainingSettings settings;
 
-      settings.convergenceSteps = fetchValue(block, "ConvergenceSteps", 100);
-      settings.batchSize        = fetchValue(block, "BatchSize", 30);
-      settings.testInterval     = fetchValue(block, "TestRepetitions", 7);
-      settings.weightDecay      = fetchValue(block, "WeightDecay", 0.0);
-      settings.learningRate         = fetchValue(block, "LearningRate", 1e-5);
-      //settings.momentum             = fetchValue(block, "Momentum", 0.3);
-      settings.corruption = fetchValue(block, "Corruption", 0.0);
+      settings.convergenceSteps = DNNParsing::fetchValue(block, "ConvergenceSteps", 100);
+      settings.batchSize        = DNNParsing::fetchValue(block, "BatchSize", 30);
+      settings.testInterval     = DNNParsing::fetchValue(block, "TestRepetitions", 7);
+      settings.weightDecay      = DNNParsing::fetchValue(block, "WeightDecay", 0.0);
+      settings.learningRate         = DNNParsing::fetchValue(block, "LearningRate", 1e-5);
+      //settings.momentum             = DNNParsing::fetchValue(block, "Momentum", 0.3);
+      settings.corruption = DNNParsing::fetchValue(block, "Corruption", 0.0);
 
-      //TString regularization = fetchValue(block, "Regularization", TString ("NONE"));
+      //TString regularization = DNNParsing::fetchValue(block, "Regularization", TString ("NONE"));
       /*if (regularization == "L1") {
          settings.regularization = DNN::ERegularization::kL1;
       } else if (regularization == "L2") {
          settings.regularization = DNN::ERegularization::kL2;
       }*/
 
-      TString strMultithreading = fetchValue(block, "Multithreading",
+      TString strMultithreading = DNNParsing::fetchValue(block, "Multithreading",
                                              TString ("True"));
       if (strMultithreading.BeginsWith ("T")) {
          settings.multithreading = true;

@@ -9,55 +9,55 @@
 
 namespace TMVA 
 {
-  class DNNParsing {  
+  namespace DNNParsing {  
   
 
-  public:   
-
-  static TString fetchValue (const std::map<TString, TString>& keyValueMap, TString key);  
+ 
+  TString fetchValue (const std::map<TString, TString>& keyValueMap, TString key);  
 
   ////////////////////////////////////////////////////////////////////////////////  
 
   template <typename T>
-  static T fetchValue(const std::map<TString,TString>& keyValueMap,
+  T fetchValue(const std::map<TString,TString>& keyValueMap,
                 TString key,
                 T defaultValue);  
 
   ////////////////////////////////////////////////////////////////////////////////  
 
+
+
+
   template <>
-  static std::vector<double> fetchValue(const std::map<TString, TString> & keyValueMap,
+  std::vector<double> DNNParsing::fetchValue(const std::map<TString, TString> & keyValueMap,
                                  TString key,
                                  std::vector<double> defaultValue);   
 
     
 
   template <>
-  static int fetchValue(const std::map<TString,TString>& keyValueMap,
+  int DNNParsing::fetchValue(const std::map<TString,TString>& keyValueMap,
                  TString key,
                  int defaultValue);   
 
   ////////////////////////////////////////////////////////////////////////////////  
 
   template <>
-  static double fetchValue (const std::map<TString,TString>& keyValueMap,
+  double DNNParsing::fetchValue (const std::map<TString,TString>& keyValueMap,
                      TString key, double defaultValue); 
 
   ////////////////////////////////////////////////////////////////////////////////  
 
   template <>
-  static TString fetchValue (const std::map<TString,TString>& keyValueMap,
+  TString DNNParsing::fetchValue (const std::map<TString,TString>& keyValueMap,
                       TString key, TString defaultValue);   
 
   ////////////////////////////////////////////////////////////////////////////////  
 
   template <>
-  static bool fetchValue (const std::map<TString,TString>& keyValueMap,
+  bool DNNParsing::fetchValue (const std::map<TString,TString>& keyValueMap,
                    TString key, bool defaultValue);   
-
-  ClassDef(DNNParsing,0);
-
-  }; 
+  
+  }
 
 }
 
