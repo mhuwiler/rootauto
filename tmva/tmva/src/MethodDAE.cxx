@@ -307,26 +307,26 @@ auto TMVA::MethodDAE::ParseLayoutString(TString layoutString)
   // TO DO
   std::vector<Int_t> layout;
 
-  TString delim = ","; 
+  TString delimiter = ","; 
 
-  int stringLength=layoutString.Length();
-  int delimLength=delim.Length(); 
+  int stringLength = layoutString.Length();
+  //int delimLength=delim.Length(); 
 
-  std::cout<<"String: "<<layoutString<<"  "<<stringLength<<std::endl;
-  std::cout<<"Delim: "<<delim<<"  "<<delimLength<<std::endl;  
+  //std::cout<<"String: "<<layoutString<<"  "<<stringLength<<std::endl;
+  //std::cout<<"Delim: "<<delim<<"  "<<delimLength<<std::endl;  
 
   std::cout<<layoutString<<"  "<<stringLength<<std::endl; 
 
   int stop=1;
   TString temp="---";
   while(stop!=-1){
-      stop = layoutString.First(delim); 
+      stop = layoutString.First(delimiter); 
 
       if(stop!=-1){
           temp = layoutString(0, stop);
           std::cout<<"Substring: "<<temp<<std::endl;
-          TSubString newString = layoutString( stop+delimLength, stringLength );
-          layoutString=newString;
+          TSubString subString = layoutString( stop+delimiter.Length(), stringLength );
+          layoutString=subString;
           stringLength=layoutString.Length();
       }
       else{
@@ -355,7 +355,10 @@ Bool_t TMVA::MethodDAE::HasAnalysisType(Types::EAnalysisType type,
 ////////////////////////////////////////////////////////////////////////////////
 void TMVA::MethodDAE::Train() {
 
-  std::cout << "MethodDAE is training... " << std::endl; 
+  std::cout << "MethodDAE is training... " << std::endl;
+  for (unsigned int i=0; i<fLayout.size(); i++) {
+    std::cout << fLayout[i] << std::endl;  
+  }
   if (fArchitectureString == "GPU") {
     TrainGpu();
     return;
@@ -368,6 +371,7 @@ void TMVA::MethodDAE::Train() {
   }
   else {
     //TrainStd(); 
+    //TrainLayer(); 
   }
 }
 
