@@ -79,23 +79,17 @@ private:
 
   //TSDAE<Architecture_t>* net; 
   EInitialization fWeightInitialization; ///< The initialization method
-  EOutputFunction
-      fOutputFunction; ///< The output function for making the predictions
+  EOutputFunction fOutputFunction; ///< The output function for making the predictions
 
   TString fLayoutString; ///< The string defining the layout of the DAE
-  TString
-      fErrorStrategy; ///< The string defining the error strategy for training
-  TString
-      fTrainingStrategyString; ///< The string defining the training strategy
+  TString fErrorStrategy; ///< The string defining the error strategy for training
+  TString fTrainingStrategyString; ///< The string defining the training strategy
   TString fWeightInitializationString; ///< The string defining the weight
-                                       ///initialization method
-  TString
-      fArchitectureString; ///< The string defining the architecure: CPU or GPU
+  TString fArchitectureString; ///< The string defining the architecure: CPU or GPU
   bool fResume;
 
   LayoutVector_t fLayout; ///< Dimensions and activation functions of each layer
-  std::vector<TTrainingSettings>
-      fTrainingSettings; ///< The vector defining each training strategy
+  std::vector<TTrainingSettings> fTrainingSettings; ///< The vector defining each training strategy
 
   void Init();
 

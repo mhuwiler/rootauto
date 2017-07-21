@@ -89,7 +89,7 @@ void TMVA::MethodDAE::Init() {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Options to be set in the option string
-void TMVA::MethodDAE::DeclareOptions() {
+void TMVA::MethodDAE::DeclareOptions() {                        // Change this 
   DeclareOptionRef(fLayoutString="SOFTSIGN|(N+100)*2,LINEAR",
                                   "Layout",
                                   "Layout of the network.");
@@ -108,7 +108,7 @@ void TMVA::MethodDAE::DeclareOptions() {
    AddPreDefVal(TString("XAVIER"));
    AddPreDefVal(TString("XAVIERUNIFORM"));
 
-   DeclareOptionRef(fArchitectureString = "CPU", "Architecture", "Which architecture to perform the training on.");
+   DeclareOptionRef(fArchitectureString = "STANDARD", "Architecture", "Which architecture to perform the training on.");
    AddPreDefVal(TString("STANDARD"));
    AddPreDefVal(TString("CPU"));
    AddPreDefVal(TString("GPU"));
@@ -128,120 +128,11 @@ void TMVA::MethodDAE::DeclareOptions() {
                                  "BatchSize=20,"
                                  "TestRepetitions=7,"
                                  "WeightDecay=0.001,"
-                                 "Renormalize=L2,"
-                                 "DropConfig=0.0+0.5+0.5,"
                                  "DropRepetitions=5,"
                                  "Multithreading=True",
                                  "TrainingStrategy",
                                  "Defines the training strategies.");
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Parsing and processing all optiions defining the DAE
-
-
-
-/*TString MethodDAE::fetchValue (const std::map<TString, TString>& keyValueMap, TString key)
-{
-   key.ToUpper ();
-   std::map<TString, TString>::const_iterator it = keyValueMap.find (key);
-   if (it == keyValueMap.end()) {
-      return TString ("");
-   }
-   return it->second;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-T MethodDAE::fetchValue(const std::map<TString,TString>& keyValueMap,
-              TString key,
-              T defaultValue);
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-std::vector<double> MethodDAE::fetchValue(const std::map<TString, TString> & keyValueMap,
-                               TString key,
-                               std::vector<double> defaultValue)
-{
-   TString parseString (fetchValue (keyValueMap, key));
-   if (parseString == "") {
-      return defaultValue;
-   }
-   parseString.ToUpper ();
-   std::vector<double> values;
-
-   const TString tokenDelim ("+");
-   TObjArray* tokenStrings = parseString.Tokenize (tokenDelim);
-   TIter nextToken (tokenStrings);
-   TObjString* tokenString = (TObjString*)nextToken ();
-   for (; tokenString != NULL; tokenString = (TObjString*)nextToken ()) {
-      std::stringstream sstr;
-      double currentValue;
-      sstr << tokenString->GetString ().Data ();
-      sstr >> currentValue;
-      values.push_back (currentValue);
-   }
-   return values;
-}
-
-
-template <>
-int MethodDAE::fetchValue(const std::map<TString,TString>& keyValueMap,
-               TString key,
-               int defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   return value.Atoi ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-double MethodDAE::fetchValue (const std::map<TString,TString>& keyValueMap,
-                   TString key, double defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   return value.Atof ();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-TString MethodDAE::fetchValue (const std::map<TString,TString>& keyValueMap,
-                    TString key, TString defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   return value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <>
-bool MethodDAE::fetchValue (const std::map<TString,TString>& keyValueMap,
-                 TString key, bool defaultValue)
-{
-   TString value (fetchValue (keyValueMap, key));
-   if (value == "") {
-      return defaultValue;
-   }
-   value.ToUpper ();
-   if (value == "TRUE" || value == "T" || value == "1") {
-      return true;
-   }
-   return false;
-}*/
-
 
 void TMVA::MethodDAE::ProcessOptions() {
   if (IgnoreEventsWithNegWeightsInTraining()) {             // Shall we keep this? 
@@ -251,7 +142,7 @@ void TMVA::MethodDAE::ProcessOptions() {
    }
 
    if (fArchitectureString == "STANDARD") {
-      Log() << kERROR << "The STANDARD architecture has been deprecated. "
+      /*Log() << kERROR << "The STANDARD architecture has been deprecated. "
                          "Please use Architecture=CPU or Architecture=CPU."
                          "See the TMVA Users' Guide for instructions if you "
                          "encounter problems."
@@ -260,7 +151,7 @@ void TMVA::MethodDAE::ProcessOptions() {
                          "Please use Architecture=CPU or Architecture=CPU."
                          "See the TMVA Users' Guide for instructions if you "
                          "encounter problems."
-            << Endl;
+            << Endl;*/
    }
 
    if (fArchitectureString == "OPENCL") {
@@ -403,6 +294,7 @@ void TMVA::MethodDAE::ProcessOptions() {
       }
 
       fTrainingSettings.push_back(settings);
+
    }
 }
 
@@ -441,7 +333,7 @@ auto TMVA::MethodDAE::ParseLayoutString(TString layoutString)
           stringLength=layoutString.Length();
           temp = layoutString(0, stringLength);
           std::cout<<"Substring: "<<temp<<std::endl;
-      } 
+      }                                                               // Works! 
 
       layout.push_back(std::stoi(std::string(temp)));
   }
@@ -473,6 +365,9 @@ void TMVA::MethodDAE::Train() {
   } else if (fArchitectureString == "CPU") {
     TrainCpu();
     return;
+  }
+  else {
+    //TrainStd(); 
   }
 }
 
