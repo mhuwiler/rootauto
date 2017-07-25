@@ -418,64 +418,13 @@ void TMVA::MethodDAE::Train() {
    const std::vector<TMVA::Event*>& eventCollectionTraining = GetEventCollection (Types::kTraining);
    const std::vector<TMVA::Event*>& eventCollectionTesting  = GetEventCollection (Types::kTesting);
 
-   for (auto &event : eventCollectionTraining) {
-      const std::vector<Float_t>& values = event->GetValues();
-      if (fAnalysisType == Types::kClassification) {
-         double outputValue = event->GetClass () == 0 ? 0.9 : 0.1;
-         trainPattern.push_back(Pattern (values.begin(),
-                                         values.end(),
-                                         outputValue,
-                                         event->GetWeight()));
-         trainPattern.back().addInput(1.0);
-      } else if (fAnalysisType == Types::kMulticlass) {
-         std::vector<Float_t> oneHot(DataInfo().GetNClasses(), 0.0);
-         oneHot[event->GetClass()] = 1.0;
-         trainPattern.push_back(Pattern (values.begin(), values.end(),
-                                        oneHot.cbegin(), oneHot.cend(),
-                                        event->GetWeight()));
-         trainPattern.back().addInput(1.0);
-      } else {
-         const std::vector<Float_t>& targets = event->GetTargets ();
-         trainPattern.push_back(Pattern(values.begin(),
-                                        values.end(),
-                                        targets.begin(),
-                                        targets.end(),
-                                        event->GetWeight ()));
-         trainPattern.back ().addInput (1.0); // bias node
-      }
-   }
+   for (unsigned int t =0; t<fTrainingSettings.size(); t++) {
 
-   for (auto &event : eventCollectionTesting) {
-      const std::vector<Float_t>& values = event->GetValues();
-      if (fAnalysisType == Types::kClassification) {
-         double outputValue = event->GetClass () == 0 ? 0.9 : 0.1;
-         testPattern.push_back(Pattern (values.begin(),
-                                         values.end(),
-                                         outputValue,
-                                         event->GetWeight()));
-         testPattern.back().addInput(1.0);
-      } else if (fAnalysisType == Types::kMulticlass) {
-         std::vector<Float_t> oneHot(DataInfo().GetNClasses(), 0.0);
-         oneHot[event->GetClass()] = 1.0;
-         testPattern.push_back(Pattern (values.begin(), values.end(),
-                                        oneHot.cbegin(), oneHot.cend(),
-                                        event->GetWeight()));
-         testPattern.back().addInput(1.0);
-      } else {
-         const std::vector<Float_t>& targets = event->GetTargets ();
-         testPattern.push_back(Pattern(values.begin(),
-                                        values.end(),
-                                        targets.begin(),
-                                        targets.end(),
-                                        event->GetWeight ()));
-         testPattern.back ().addInput (1.0); // bias node
-      }
-   }
 
   TMVA::Event *event = eventCollectionTraining[0]; 
   const std::vector<Float_t> values = event->GetValues();
   Int_t totalColumnsInput = values.size(); 
-  Int_t batchSize = fTrainingSettings[0].batchSize;     // Fix this 
+  Int_t batchSize = fTrainingSettings[t].batchSize;     // Fix this 
   size_t totalRowsInput = eventCollectionTraining.size(); 
   size_t numOfFullBatches = static_cast<int>(totalRowsInput)/static_cast<int>(batchSize); 
   size_t numOfRowsLastBatch = (static_cast<int>(totalRowsInput) % static_cast<int>(batchSize)); 
@@ -492,42 +441,6 @@ void TMVA::MethodDAE::Train() {
   }
   input.emplace_back(totalColumnsInput, numOfRowsLastBatch); 
 
-// Initialise the matrices 
-
-//for (int i=0; i< fTrainingSettings.size(); i++){//
-
-//   std::vector<double> weights;//
-
-//   Int_t totalRowsInput = eventCollectionTraining.size()/(fTrainingSettings.size()); //
-
-//   std::vector<Matrix_t> input;
-//   for (size_t i = 0; i < totalRowsInput; i++) {
-//     input.emplace_back(totalColumnsInput, 1);
-//   } 
-
-   
-
-   //for (size_t j = 0; j < (size_t)input[i].GetNrows(); j++) {
-//    const std::vector<Float_t>& values = eventCollectionTraining[j]->GetValues();
-//      for (size_t k = 0; k < (size_t)input[i].GetNcols(); k++) {
-//        input[i](j, k) = values[k];
-//      }
-//    }
-
-
-    /*for (auto &event : eventCollectionTraining) {
-      
-      if (fAnalysisType == Types::kClassification) {
-         double outputValue = event->GetClass () == 0 ? 0.9 : 0.1;
-      } else if (fAnalysisType == Types::kMulticlass) {
-         std::vector<Float_t> oneHot(DataInfo().GetNClasses(), 0.0);
-         oneHot[event->GetClass()] = 1.0;
-      } else {
-         const std::vector<Float_t>& targets = event->GetTargets ();
-      }
-
-
-   }*/
 
   for (size_t i = 0; i < numOfFullBatches + 1; i++) {
     for (size_t j = 0; j < (size_t)input[i].GetNrows(); j++) {
@@ -538,15 +451,12 @@ void TMVA::MethodDAE::Train() {
       }
     }
 
+  
 
-
-
-
-    
-
-      net->TrainLayer(input[i], fTrainingSettings[i].learningRate, fTrainingSettings[i].corruption); 
+      net->TrainLayer(input[i], fTrainingSettings[t].learningRate, fTrainingSettings[t].corruption); 
 
     }
+  }
 
   }
 }
