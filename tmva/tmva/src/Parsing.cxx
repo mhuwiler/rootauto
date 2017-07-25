@@ -1,5 +1,4 @@
 #include "TMVA/Parsing.h"
-#include "TMVA/Types.h"
 
 
 namespace TMVA {

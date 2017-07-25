@@ -578,6 +578,7 @@ namespace TMVA {
 
       std::vector<Float_t>* fRegressionReturnVal;  // holds the return-values for the regression
       std::vector<Float_t>* fMulticlassReturnVal;  // holds the return-values for the multiclass classification
+      DataSetInfo&     fDataSetInfo;         //! the data set information (sometimes needed)
 
    private:
 
@@ -586,7 +587,7 @@ namespace TMVA {
 
 
       // data sets
-      DataSetInfo&     fDataSetInfo;         //! the data set information (sometimes needed)
+      
 
       Double_t         fSignalReferenceCut;  // minimum requirement on the MVA output to declare an event signal-like
       Double_t         fSignalReferenceCutOrientation;  // minimum requirement on the MVA output to declare an event signal-like

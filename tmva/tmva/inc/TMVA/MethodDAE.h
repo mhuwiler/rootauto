@@ -56,15 +56,6 @@ using namespace TMVA::DNN;
 
 namespace TMVA {
 
-class MethodDAE : public MethodBase {
-public:
-  using Architecture_t = TReference<Double_t>;
-  using Matrix_t = typename Architecture_t::Matrix_t;
-
-private:
-  using LayoutVector_t = std::vector<Int_t>;
-  using KeyValueVector_t = std::vector<std::map<TString, TString>>;
-
   struct TTrainingSettings {
     size_t batchSize;
     size_t testInterval;
@@ -77,7 +68,17 @@ private:
     bool multithreading;
   };
 
-  //TSDAE<Architecture_t>* net; 
+class MethodDAE : public MethodBase {
+public:
+  using Architecture_t = TReference<Double_t>;
+  using Matrix_t = typename Architecture_t::Matrix_t;
+
+private:
+  using LayoutVector_t = std::vector<Int_t>;
+  using KeyValueVector_t = std::vector<std::map<TString, TString>>;
+
+  
+  TDAE<Architecture_t>* net; 
   EInitialization fWeightInitialization; ///< The initialization method
   EOutputFunction fOutputFunction; ///< The output function for making the predictions
 

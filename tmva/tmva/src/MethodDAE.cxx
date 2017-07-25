@@ -35,7 +35,13 @@
 #include "TMVA/DNN/Architectures/Reference.h"
 #include "TMVA/DNN/Functions.h"
 #include "TMVA/Parsing.h"
+#include "TMVA/DNN/DAE/DenoiseAE.h"
+#include "TMVA/DNN/Net.h"
+#include "TMVA/DNN/Architectures/Reference.h"
 
+
+
+#include "TMVA/NeuralNet.h"
 #include <iostream>
 
 REGISTER_METHOD(DAE)
@@ -77,7 +83,7 @@ TMVA::MethodDAE::MethodDAE(DataSetInfo &theData, const TString &theWeightFile)
 /// destructor
 
 TMVA::MethodDAE::~MethodDAE() {
-  //delete net; 
+  delete net; 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +91,18 @@ TMVA::MethodDAE::~MethodDAE() {
 void TMVA::MethodDAE::Init() {
   // Nothing to do here
   std::cout << "MethodDAE initialized successfully! " << std::endl; 
+
+   auto &dsi = this->DataInfo();
+  auto numClasses = dsi.GetNClasses();
+  for(UInt_t i=0; i<numClasses; ++i)
+  {
+    if(dsi.GetWeightExpression(i) != TString(""))
+    {
+      Log() << kERROR << "Currently event weights are not considered properly by this method." << Endl;
+      break;
+    }
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +159,7 @@ void TMVA::MethodDAE::ProcessOptions() {
             << Endl;
    }
 
+   //constexpr Architecture_t architecture = TStandard<>; 
    if (fArchitectureString == "STANDARD") {
       /*Log() << kERROR << "The STANDARD architecture has been deprecated. "
                          "Please use Architecture=CPU or Architecture=CPU."
@@ -152,6 +171,7 @@ void TMVA::MethodDAE::ProcessOptions() {
                          "See the TMVA Users' Guide for instructions if you "
                          "encounter problems."
             << Endl;*/
+
    }
 
    if (fArchitectureString == "OPENCL") {
@@ -211,6 +231,7 @@ void TMVA::MethodDAE::ProcessOptions() {
    //net = new TSDAE<fArchitectureString>(batchSize, inputSize, outputSize, fLayout.size(), fLayout)
 
    #pragma("build net here")
+
    //
    // Loss function and output.
    //
@@ -295,6 +316,8 @@ void TMVA::MethodDAE::ProcessOptions() {
 
       fTrainingSettings.push_back(settings);
 
+      net = new DNN::DAE::TDAE<Architecture_t>(fTrainingSettings[0].batchSize, outputSize, fLayout[0]); 
+
    }
 }
 
@@ -345,11 +368,13 @@ auto TMVA::MethodDAE::ParseLayoutString(TString layoutString)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// What kind of analysis type can handle the DAE
-Bool_t TMVA::MethodDAE::HasAnalysisType(Types::EAnalysisType type,
-                                        UInt_t numberClasses,
-                                        UInt_t /*numberTargets*/) {
-  // TO DO
-  return true;
+Bool_t TMVA::MethodDAE::HasAnalysisType(Types::EAnalysisType type, UInt_t numberClasses, UInt_t /*numberTargets*/) {
+  
+  if (type == Types::kClassification && numberClasses == 2) return kTRUE;
+  if (type == Types::kMulticlass) return kTRUE;
+  if (type == Types::kRegression) return kTRUE;
+
+  return kFALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,7 +396,155 @@ void TMVA::MethodDAE::Train() {
   }
   else {
     //TrainStd(); 
-    //TrainLayer(); 
+    /*size_t nTrainingSamples = GetEventCollection(Types::kTraining).size();
+    size_t nTestSamples     = GetEventCollection(Types::kTesting).size();
+
+    size_t trainingPhase = 1;
+    for (TTrainingSettings & settings : fTrainingSettings) {
+
+      if (fInteractive){
+         fInteractive->ClearGraphs();
+      }
+
+      Log() << "Training phase " << trainingPhase << " of "
+            << fTrainingSettings.size() << ":" << Endl;
+      trainingPhase++;
+
+    DataLoader_T trainingData()*/
+
+   std::vector<Pattern> trainPattern;
+   std::vector<Pattern> testPattern;
+
+   const std::vector<TMVA::Event*>& eventCollectionTraining = GetEventCollection (Types::kTraining);
+   const std::vector<TMVA::Event*>& eventCollectionTesting  = GetEventCollection (Types::kTesting);
+
+   for (auto &event : eventCollectionTraining) {
+      const std::vector<Float_t>& values = event->GetValues();
+      if (fAnalysisType == Types::kClassification) {
+         double outputValue = event->GetClass () == 0 ? 0.9 : 0.1;
+         trainPattern.push_back(Pattern (values.begin(),
+                                         values.end(),
+                                         outputValue,
+                                         event->GetWeight()));
+         trainPattern.back().addInput(1.0);
+      } else if (fAnalysisType == Types::kMulticlass) {
+         std::vector<Float_t> oneHot(DataInfo().GetNClasses(), 0.0);
+         oneHot[event->GetClass()] = 1.0;
+         trainPattern.push_back(Pattern (values.begin(), values.end(),
+                                        oneHot.cbegin(), oneHot.cend(),
+                                        event->GetWeight()));
+         trainPattern.back().addInput(1.0);
+      } else {
+         const std::vector<Float_t>& targets = event->GetTargets ();
+         trainPattern.push_back(Pattern(values.begin(),
+                                        values.end(),
+                                        targets.begin(),
+                                        targets.end(),
+                                        event->GetWeight ()));
+         trainPattern.back ().addInput (1.0); // bias node
+      }
+   }
+
+   for (auto &event : eventCollectionTesting) {
+      const std::vector<Float_t>& values = event->GetValues();
+      if (fAnalysisType == Types::kClassification) {
+         double outputValue = event->GetClass () == 0 ? 0.9 : 0.1;
+         testPattern.push_back(Pattern (values.begin(),
+                                         values.end(),
+                                         outputValue,
+                                         event->GetWeight()));
+         testPattern.back().addInput(1.0);
+      } else if (fAnalysisType == Types::kMulticlass) {
+         std::vector<Float_t> oneHot(DataInfo().GetNClasses(), 0.0);
+         oneHot[event->GetClass()] = 1.0;
+         testPattern.push_back(Pattern (values.begin(), values.end(),
+                                        oneHot.cbegin(), oneHot.cend(),
+                                        event->GetWeight()));
+         testPattern.back().addInput(1.0);
+      } else {
+         const std::vector<Float_t>& targets = event->GetTargets ();
+         testPattern.push_back(Pattern(values.begin(),
+                                        values.end(),
+                                        targets.begin(),
+                                        targets.end(),
+                                        event->GetWeight ()));
+         testPattern.back ().addInput (1.0); // bias node
+      }
+   }
+
+TMVA::Event *event = eventCollectionTraining[0]; 
+const std::vector<Float_t> values = event->GetValues();
+Int_t totalColumnsInput = values.size(); 
+
+  size_t totalRowsInput = sizeof(inputVector) / sizeof(inputVector[0]);
+  size_t numOfFullBatches = static_cast<int>(totalRowsInput)/static_cast<int>(fBatchSize); 
+  size_t numOfRowsLastBatch = (static_cast<int>(totalRowsInput) % static_cast<int>(fBatchSize)); 
+  size_t totalColumnsInput = sizeof(inputVector[0]) / sizeof(inputVector[0][0]);
+  size_t compressedUnits = 5;
+  double corruptionLevel = 0.2;
+  double learningRate = 0.1;
+  size_t fBatchSize = totalRowsInput;
+
+  std::vector<Matrix_t> input;
+  for (size_t i = 0; i < numOfFullBatches; i++) {
+    input.emplace_back(totalColumnsInput,fBatchSize);
+  }
+  input.emplace_back(totalColumnsInput, numOfRowsLastBatch); 
+
+// Initialise the matrices 
+
+//for (int i=0; i< fTrainingSettings.size(); i++){//
+
+//   std::vector<double> weights;//
+
+//   Int_t totalRowsInput = eventCollectionTraining.size()/(fTrainingSettings.size()); //
+
+//   std::vector<Matrix_t> input;
+//   for (size_t i = 0; i < totalRowsInput; i++) {
+//     input.emplace_back(totalColumnsInput, 1);
+//   } 
+
+   
+
+   //for (size_t j = 0; j < (size_t)input[i].GetNrows(); j++) {
+//    const std::vector<Float_t>& values = eventCollectionTraining[j]->GetValues();
+//      for (size_t k = 0; k < (size_t)input[i].GetNcols(); k++) {
+//        input[i](j, k) = values[k];
+//      }
+//    }
+
+
+    /*for (auto &event : eventCollectionTraining) {
+      
+      if (fAnalysisType == Types::kClassification) {
+         double outputValue = event->GetClass () == 0 ? 0.9 : 0.1;
+      } else if (fAnalysisType == Types::kMulticlass) {
+         std::vector<Float_t> oneHot(DataInfo().GetNClasses(), 0.0);
+         oneHot[event->GetClass()] = 1.0;
+      } else {
+         const std::vector<Float_t>& targets = event->GetTargets ();
+      }
+
+
+   }*/
+
+  for (size_t i = 0; i < numOfFullBatches + 1; i++) {
+    for (size_t j = 0; j < (size_t)input[i].GetNrows(); j++) {
+      for (size_t k = 0; k < (size_t)input[i].GetNcols(); k++) {
+        input[i](j, k) = inputVector[i][j];
+      }
+    }
+  }
+
+
+
+
+    
+
+      net->TrainLayer(input[i], fTrainingSettings[i].learningRate, fTrainingSettings[i].corruption); 
+
+    }
+
   }
 }
 
@@ -394,12 +567,72 @@ Double_t TMVA::MethodDAE::GetMvaValue(Double_t * /*errLower*/,
 
 ////////////////////////////////////////////////////////////////////////////////
 void TMVA::MethodDAE::AddWeightsXMLTo(void *parent) const {
-  // TO DO
+  /*void* nn = gTools().xmlengine().NewChild(parent, 0, "Weights");
+  Int_t inputWidth = net->GetInputWidth();
+  Int_t depth      = net->GetDepth();
+  char  lossFunction = static_cast<char>(fNet.GetLossFunction());
+  gTools().xmlengine().NewAttr(nn, 0, "InputWidth", gTools().StringFromInt(inputWidth));
+  gTools().xmlengine().NewAttr(nn, 0, "Depth", gTools().StringFromInt(depth));
+  gTools().xmlengine().NewAttr(nn, 0, "LossFunction", TString(lossFunction));
+  gTools().xmlengine().NewAttr(nn, 0, "OutputFunction", TString(static_cast<char>(fOutputFunction)));
+
+  for (Int_t i = 0; i < depth; i++) {
+    const auto& layer = net->GetLayer(i);
+    auto layerxml = gTools().xmlengine().NewChild(nn, 0, "Layer");
+    int activationFunction = static_cast<int>(layer.GetActivationFunction());
+    gTools().xmlengine().NewAttr(layerxml, 0, "ActivationFunction", TString::Itoa(activationFunction, 10));
+    WriteMatrixXML(layerxml, "Weights", layer.GetWeights());
+    WriteMatrixXML(layerxml, "Biases",  layer.GetBiases());
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void TMVA::MethodDAE::ReadWeightsFromXML(void *rootXML) {
-  // TO DO
+  /*auto netXML = gTools().GetChild(rootXML, "Weights");
+  if (!netXML){
+     netXML = rootXML;
+  }
+  //fNet.Clear();
+  //fNet.SetBatchSize(1);
+
+  size_t inputWidth, depth;
+  gTools().ReadAttr(netXML, "InputWidth", inputWidth);
+  gTools().ReadAttr(netXML, "Depth", depth);
+  char lossFunctionChar;
+  gTools().ReadAttr(netXML, "LossFunction", lossFunctionChar);
+  char outputFunctionChar;
+  gTools().ReadAttr(netXML, "OutputFunction", outputFunctionChar);
+
+  fNet.SetInputWidth(inputWidth);
+  fNet.SetLossFunction(static_cast<ELossFunction>(lossFunctionChar));
+  fOutputFunction = static_cast<EOutputFunction>(outputFunctionChar);
+
+  size_t previousWidth = inputWidth;
+  auto layerXML = gTools().xmlengine().GetChild(netXML, "Layer");
+  for (size_t i = 0; i < depth; i++) {
+     TString fString;
+     EActivationFunction f;
+
+     // Read activation function.
+     gTools().ReadAttr(layerXML, "ActivationFunction", fString);
+     f = static_cast<EActivationFunction>(fString.Atoi());
+
+     // Read number of neurons.
+     size_t width;
+     auto matrixXML = gTools().GetChild(layerXML, "Weights");
+     gTools().ReadAttr(matrixXML, "rows", width);
+
+     fNet.AddLayer(width, f);
+     TMatrixT<Double_t> weights(width, previousWidth);
+     TMatrixT<Double_t> biases(width, 1);
+     ReadMatrixXML(layerXML, "Weights", weights);
+     ReadMatrixXML(layerXML, "Biases",  biases);
+     fNet.GetLayer(i).GetWeights() = weights;
+     fNet.GetLayer(i).GetBiases()  = biases;
+
+     layerXML = gTools().GetNextChild(layerXML);
+     previousWidth = width;
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -407,7 +640,11 @@ void TMVA::MethodDAE::ReadWeightsFromStream(std::istream & /*istr*/) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 const TMVA::Ranking *TMVA::MethodDAE::CreateRanking() {
-  // TO DO
+  /*fRanking = new Ranking( GetName(), "Importance" );
+  for (UInt_t ivar=0; ivar<GetNvar(); ivar++) {
+    fRanking->AddRank( Rank( GetInputLabel(ivar), 1.0));
+  }
+  return fRanking;*/
   return NULL;
 }
 
