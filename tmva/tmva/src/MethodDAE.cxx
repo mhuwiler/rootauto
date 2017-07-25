@@ -472,22 +472,23 @@ void TMVA::MethodDAE::Train() {
       }
    }
 
-TMVA::Event *event = eventCollectionTraining[0]; 
-const std::vector<Float_t> values = event->GetValues();
-Int_t totalColumnsInput = values.size(); 
-
-  size_t totalRowsInput = sizeof(inputVector) / sizeof(inputVector[0]);
-  size_t numOfFullBatches = static_cast<int>(totalRowsInput)/static_cast<int>(fBatchSize); 
-  size_t numOfRowsLastBatch = (static_cast<int>(totalRowsInput) % static_cast<int>(fBatchSize)); 
-  size_t totalColumnsInput = sizeof(inputVector[0]) / sizeof(inputVector[0][0]);
+  TMVA::Event *event = eventCollectionTraining[0]; 
+  const std::vector<Float_t> values = event->GetValues();
+  Int_t totalColumnsInput = values.size(); 
+  Int_t batchSize = fTrainingSettings[0].batchSize;     // Fix this 
+  size_t totalRowsInput = eventCollectionTraining.size(); 
+  size_t numOfFullBatches = static_cast<int>(totalRowsInput)/static_cast<int>(batchSize); 
+  size_t numOfRowsLastBatch = (static_cast<int>(totalRowsInput) % static_cast<int>(batchSize)); 
   size_t compressedUnits = 5;
   double corruptionLevel = 0.2;
   double learningRate = 0.1;
   size_t fBatchSize = totalRowsInput;
+   
+ 
 
   std::vector<Matrix_t> input;
   for (size_t i = 0; i < numOfFullBatches; i++) {
-    input.emplace_back(totalColumnsInput,fBatchSize);
+    input.emplace_back(totalColumnsInput,batchSize);
   }
   input.emplace_back(totalColumnsInput, numOfRowsLastBatch); 
 
@@ -530,11 +531,13 @@ Int_t totalColumnsInput = values.size();
 
   for (size_t i = 0; i < numOfFullBatches + 1; i++) {
     for (size_t j = 0; j < (size_t)input[i].GetNrows(); j++) {
+      const std::vector<Float_t> values = event->GetValues();
       for (size_t k = 0; k < (size_t)input[i].GetNcols(); k++) {
-        input[i](j, k) = inputVector[i][j];
+        int n(i*batchSize + j);
+        input[i](j, k) = values[k];
       }
     }
-  }
+
 
 
 
