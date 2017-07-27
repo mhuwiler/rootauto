@@ -63,10 +63,10 @@ TMVA::MethodDAE::MethodDAE(const TString &jobName, const TString &methodTitle,
       fWeightInitialization(), fOutputFunction(), fLayoutString(),
       fErrorStrategy(), fTrainingStrategyString(),
       fWeightInitializationString(), fArchitectureString(), fResume(false),
-      fTrainingSettings()
-
+      fTrainingSettings() 
 {
   // Nothing to do here
+  fAnalysisType = Types::EAnalysisType(Types::kRegression); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,8 @@ TMVA::MethodDAE::MethodDAE(DataSetInfo &theData, const TString &theWeightFile)
       fOutputFunction(), fLayoutString(), fErrorStrategy(),
       fTrainingStrategyString(), fWeightInitializationString(),
       fArchitectureString(), fResume(false), fTrainingSettings() {
-  // Nothing to do here
+  // Nothing to do here    
+  fAnalysisType = Types::EAnalysisType(Types::kRegression);  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,6 +227,8 @@ void TMVA::MethodDAE::ProcessOptions() {
       outputSize = DataInfo().GetNClasses();
    }
 
+   outputSize = fLayout[0]; 
+
    // Set the input size and the batch size for the net. 
 
    //net = new TSDAE<fArchitectureString>(batchSize, inputSize, outputSize, fLayout.size(), fLayout)
@@ -370,7 +373,7 @@ auto TMVA::MethodDAE::ParseLayoutString(TString layoutString)
 /// What kind of analysis type can handle the DAE
 Bool_t TMVA::MethodDAE::HasAnalysisType(Types::EAnalysisType type, UInt_t numberClasses, UInt_t /*numberTargets*/) {
   
-  if (type == Types::kClassification && numberClasses == 2) return kTRUE;
+  if (type == Types::kClassification && numberClasses == 2) return kFALSE;
   if (type == Types::kMulticlass) return kTRUE;
   if (type == Types::kRegression) return kTRUE;
 
@@ -423,31 +426,35 @@ void TMVA::MethodDAE::Train() {
 
   TMVA::Event *event = eventCollectionTraining[0]; 
   const std::vector<Float_t> values = event->GetValues();
+  std::cout << values.size() << std::endl; 
   Int_t totalColumnsInput = values.size(); 
-  Int_t batchSize = fTrainingSettings[t].batchSize;     // Fix this 
+  Int_t batchSize = eventCollectionTraining.size(); //fTrainingSettings[t].batchSize;     // Fix this 
   size_t totalRowsInput = eventCollectionTraining.size(); 
+  std::cout << totalRowsInput << std::endl; 
   size_t numOfFullBatches = static_cast<int>(totalRowsInput)/static_cast<int>(batchSize); 
   size_t numOfRowsLastBatch = (static_cast<int>(totalRowsInput) % static_cast<int>(batchSize)); 
   size_t compressedUnits = 5;
   double corruptionLevel = 0.2;
   double learningRate = 0.1;
   size_t fBatchSize = totalRowsInput;
+
+  std::cout << "Num of batches : " << numOfFullBatches + 1 << " Num of rows last batch : " << numOfRowsLastBatch << std::endl; 
    
  
 
   std::vector<Matrix_t> input;
   for (size_t i = 0; i < numOfFullBatches; i++) {
-    input.emplace_back(totalColumnsInput,batchSize);
+    input.emplace_back(totalColumnsInput, 1);
   }
-  input.emplace_back(totalColumnsInput, numOfRowsLastBatch); 
+  //input.emplace_back(totalColumnsInput, 1); 
 
 
-  for (size_t i = 0; i < numOfFullBatches + 1; i++) {
+  for (size_t i = 0; i < numOfFullBatches ; i++) {  // + 1
     for (size_t j = 0; j < (size_t)input[i].GetNrows(); j++) {
       const std::vector<Float_t> values = event->GetValues();
       for (size_t k = 0; k < (size_t)input[i].GetNcols(); k++) {
         int n(i*batchSize + j);
-        input[i](j, k) = values[k];
+        input[i](j, k) = values[j];
       }
     }
 
