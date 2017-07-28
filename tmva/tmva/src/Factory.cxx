@@ -168,6 +168,7 @@ TMVA::Factory::Factory( TString jobName, TFile* theTargetFile, TString theOption
    AddPreDefVal(TString("Classification"));
    AddPreDefVal(TString("Regression"));
    AddPreDefVal(TString("Multiclass"));
+   AddPreDefVal(TString("Unsupervised")); 
    AddPreDefVal(TString("Auto"));
 
    ParseOptions();

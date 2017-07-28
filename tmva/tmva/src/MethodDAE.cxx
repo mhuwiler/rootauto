@@ -38,6 +38,8 @@
 #include "TMVA/DNN/DAE/DenoiseAE.h"
 #include "TMVA/DNN/Net.h"
 #include "TMVA/DNN/Architectures/Reference.h"
+#include "TMVA/DNN/TestLogisticRegressionLayer.h"
+#include "TMVA/DNN/TestUtilsAE.h"
 
 
 
@@ -417,11 +419,14 @@ void TMVA::MethodDAE::Train() {
 
     DataLoader_T trainingData()*/
 
+
    std::vector<Pattern> trainPattern;
    std::vector<Pattern> testPattern;
 
    const std::vector<TMVA::Event*>& eventCollectionTraining = GetEventCollection (Types::kTraining);
    const std::vector<TMVA::Event*>& eventCollectionTesting  = GetEventCollection (Types::kTesting);
+
+  // For denoise layer (unsupervised learning, to come) needs unsupervised learning 
 
    for (unsigned int t =0; t<fTrainingSettings.size(); t++) {
 
@@ -467,7 +472,97 @@ void TMVA::MethodDAE::Train() {
     }
   }
 
+  // For classification 
+
+  std::vector<Matrix_t> TrainX;
+  std::vector<Matrix_t> TrainY;  
+  for (unsigned int i=0; i<1/*eventCollectionTraining.size()*/; i++) 
+  {
+    TMVA::Event *event = eventCollectionTraining[i];
+    const std::vector<Float_t> values = event->GetValues();
+    
+    // Testing the values ...                                                   // test
+    for (int j=0; j<values.size(); j++)                                         // test
+    {                                                                           // test
+      std::cout << values[j] << " ";                                            // test
+    }                                                                           // test
+
+    Int_t numcol = values.size(); 
+
+    size_t totalRowsTrainInput = eventCollectionTraining.size();
+    size_t totalColumnsTrainInput = values.size();
+
+    size_t totalRowsTrainOutput= totalRowsTrainInput;
+    size_t totalColumnsTrainOutput = totalColumnsTrainInput; 
+
+    size_t totalRowsTestInput = eventCollectionTesting.size();
+    size_t totalColumnsTestInput = 10; 
+
+    size_t totalRowsTestOutput= 2;
+    size_t totalColumnsTestOutput = 2;
+
+    TrainX.emplace_back(numcol, 1); 
+    TrainY.emplace_back(numcol, 1); 
+
+
   }
+
+  std::cout << "size x : " << TrainX.size() << " size Y : " << TrainY.size() << std::endl;      // test
+
+  Matrix_t p(totalColumnsTestOutput,1);
+  Matrix_t difference(totalColumnsTestOutput,1);
+  Matrix_t Weights(totalColumnsTestOutput,totalColumnsTrainInput);
+  randomMatrix(Weights);
+  std::cout<<"Weights "<<Weights.GetNrows()<<" "<<Weights.GetNcols()<<std::endl;
+
+
+  Matrix_t Biases(totalColumnsTestOutput,1);
+  for(size_t epoch=0;epoch<1000;epoch++){
+  for(size_t i=0; i<totalRowsTrainInput; i++)
+  {
+    TMVA::Event *event = eventCollectionTraining[i];
+    const std::vector<Float_t> values = event->GetValues();
+    for( size_t j=0; j<(size_t)TrainX[i].GetNrows(); j++)
+    {
+      for(size_t k=0; k<(size_t)TrainX[i].GetNcols(); k++)
+      {
+        TrainX[i](j,k) = values[j];
+      }
+    }
+    for(size_t j=0; j<(size_t)TrainY[i].GetNrows(); j++)
+    {
+      for(size_t k=0; k<(size_t)TrainY[i].GetNcols(); k++)
+      {
+        TrainY[i](j,k) = values[j];   // To be changed 
+      }
+    }
+
+    std::cout<<"crating p matrix"  << std::endl;
+    testForwardLogReg<TReference<double>>(TrainX[i],p, Weights);
+
+    std::cout<<"Adding Bias matrix to given Matrix"<<std::endl;
+    testAddBiases<TReference<double>>(p,Biases);
+
+    std::cout<<std::endl;
+    std::cout<<"Given Matrix after Softmax Operation"<<std::endl;
+    testSoftmaxAE<TReference<double>>(p);
+    std::cout<<std::endl;
+
+    std::cout<<"updating parameters"  << std::endl;
+    testUpdateParamsLogReg<TReference<double>>(TrainX[i],TrainY[i], difference,p,
+                                               Weights,Biases,learningRate,fBatchSize);
+
+    }
+
+  }
+
+
+
+
+  }
+
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
