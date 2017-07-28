@@ -66,7 +66,7 @@ TMVA::MethodDAE::MethodDAE(const TString &jobName, const TString &methodTitle,
       fTrainingSettings() 
 {
   // Nothing to do here
-  fAnalysisType = Types::EAnalysisType(Types::kRegression); 
+  fAnalysisType = Types::EAnalysisType(Types::kUnsupervised); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ TMVA::MethodDAE::MethodDAE(DataSetInfo &theData, const TString &theWeightFile)
       fTrainingStrategyString(), fWeightInitializationString(),
       fArchitectureString(), fResume(false), fTrainingSettings() {
   // Nothing to do here    
-  fAnalysisType = Types::EAnalysisType(Types::kRegression);  
+  fAnalysisType = Types::EAnalysisType(Types::kUnsupervised);  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,9 +373,11 @@ auto TMVA::MethodDAE::ParseLayoutString(TString layoutString)
 /// What kind of analysis type can handle the DAE
 Bool_t TMVA::MethodDAE::HasAnalysisType(Types::EAnalysisType type, UInt_t numberClasses, UInt_t /*numberTargets*/) {
   
-  if (type == Types::kClassification && numberClasses == 2) return kFALSE;
-  if (type == Types::kMulticlass) return kTRUE;
-  if (type == Types::kRegression) return kTRUE;
+  if (type == Types::kUnsupervised) return kTRUE; 
+  if (type == Types::kClassification) return kFALSE;
+  if (type == Types::kMulticlass) return kFALSE;
+  if (type == Types::kRegression) return kFALSE;
+
 
   return kFALSE;
 }

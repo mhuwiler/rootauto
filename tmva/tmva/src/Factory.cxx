@@ -185,6 +185,7 @@ TMVA::Factory::Factory( TString jobName, TFile* theTargetFile, TString theOption
    else if( analysisType == "regression" )     fAnalysisType = Types::kRegression;
    else if( analysisType == "multiclass" )     fAnalysisType = Types::kMulticlass;
    else if( analysisType == "auto" )           fAnalysisType = Types::kNoAnalysisType;
+   else if (analysisType == "unsupervised")    fAnalysisType = Types::kUnsupervised; 
 
 //   Greetings();
 }
@@ -245,6 +246,7 @@ TMVA::Factory::Factory( TString jobName, TString theOption )
    AddPreDefVal(TString("Classification"));
    AddPreDefVal(TString("Regression"));
    AddPreDefVal(TString("Multiclass"));
+   AddPreDefVal(TString("Unsupervised")); 
    AddPreDefVal(TString("Auto"));
 
    ParseOptions();
@@ -1173,8 +1175,8 @@ void TMVA::Factory::TestAllMethods()
      if(mva==0) continue;
      Types::EAnalysisType analysisType = mva->GetAnalysisType();
      Log() << kHEADER << "Test method: " << mva->GetMethodName() << " for "
-      << (analysisType == Types::kRegression ? "Regression" :
-          (analysisType == Types::kMulticlass ? "Multiclass classification" : "Classification")) << " performance" << Endl << Endl;
+      << (analysisType == Types::kUnsupervised ? "Unsupervised" :(analysisType == Types::kRegression ? "Regression" :
+          (analysisType == Types::kMulticlass ? "Multiclass classification" : "Classification"))) << " performance" << Endl << Endl;
      mva->AddOutput( Types::kTesting, analysisType );
       }
    }
@@ -1367,7 +1369,9 @@ void TMVA::Factory::EvaluateAllMethods( void )
       theMethod->WriteEvaluationHistosToFile(Types::kTesting);
       theMethod->WriteEvaluationHistosToFile(Types::kTraining);
        }
-     } else if (theMethod->DoMulticlass()) {
+     } 
+     else if (theMethod->DoMulticlass()) 
+     {
         // ====================================================================
         // === Multiclass evaluation
         // ====================================================================
@@ -1393,7 +1397,13 @@ void TMVA::Factory::EvaluateAllMethods( void )
 
         nmeth_used[0]++;
         mname[0].push_back(theMethod->GetMethodName());
-     } else {
+     } 
+     else if (theMethod->Unsupervised())
+     {   
+         // Design here the evaluation for the autoencoder... 
+     }
+     else 
+     {
 
         Log() << kHEADER << "Evaluate classifier: " << theMethod->GetMethodName() << Endl << Endl;
         isel = (theMethod->GetMethodTypeName().Contains("Variable")) ? 1 : 0;
