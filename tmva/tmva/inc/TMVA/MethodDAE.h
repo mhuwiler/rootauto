@@ -59,21 +59,16 @@ class MethodDAE : public MethodBase {
 public:
   using Architecture_t = TReference<Double_t>;
   using Matrix_t = typename Architecture_t::Matrix_t;
+  using TDAE = TDAE<Architecture_t>;
 
 private:
-  using LayoutVector_t = std::tuple<>;
+  using LayoutVector_t = std::vector<std::tuple>;
   using KeyValueVector_t = std::vector<std::map<TString, TString>>;
 
   struct TTrainingSettings {
     size_t batchSize;
-    size_t testInterval;
-    size_t convergenceSteps;
-    DNN::ERegularization regularization;
     Double_t learningRate;
-    Double_t momentum;
-    Double_t weightDecay;
-    Double_t dropoutProbability;
-    bool multithreading;
+    Double_t corruptionLevel;
   };
   EInitialization fWeightInitialization; ///< The initialization method
   EOutputFunction
@@ -99,6 +94,11 @@ private:
   // the option handling methods
   void DeclareOptions();
   void ProcessOptions();
+
+  TDAE dae;
+
+  DNN::EInitialization fWeightInitialization;
+  DNN::EOutputFunction fOutputFunction;
 
   // Write and read weights from an XML file
   static inline void WriteMatrixXML(void *parent, const char *name,
