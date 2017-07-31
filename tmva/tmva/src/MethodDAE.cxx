@@ -474,6 +474,8 @@ void TMVA::MethodDAE::Train() {
 
   // For classification 
 
+  size_t totalRowsTrainOutput;
+  size_t totalColumnsTrainOutput;
   std::vector<Matrix_t> TrainX;
   std::vector<Matrix_t> TrainY;  
   for (unsigned int i=0; i<1/*eventCollectionTraining.size()*/; i++) 
@@ -492,20 +494,21 @@ void TMVA::MethodDAE::Train() {
     size_t totalRowsTrainInput = eventCollectionTraining.size();
     size_t totalColumnsTrainInput = values.size();
 
-    size_t totalRowsTrainOutput= totalRowsTrainInput;
-    size_t totalColumnsTrainOutput = totalColumnsTrainInput; 
+    totalRowsTrainOutput= totalRowsTrainInput;
+    totalColumnsTrainOutput = totalColumnsTrainInput; 
 
-    size_t totalRowsTestInput = eventCollectionTesting.size();
-    size_t totalColumnsTestInput = 10; 
-
-    size_t totalRowsTestOutput= 2;
-    size_t totalColumnsTestOutput = 2;
 
     TrainX.emplace_back(numcol, 1); 
     TrainY.emplace_back(numcol, 1); 
 
 
   }
+
+  size_t totalRowsTestInput = eventCollectionTesting.size();
+  size_t totalColumnsTestInput = 10; 
+
+  size_t totalRowsTestOutput= 2;
+  size_t totalColumnsTestOutput = 2;
 
   std::cout << "size x : " << TrainX.size() << " size Y : " << TrainY.size() << std::endl;      // test
 
@@ -550,7 +553,7 @@ void TMVA::MethodDAE::Train() {
 
     std::cout<<"updating parameters"  << std::endl;
     testUpdateParamsLogReg<TReference<double>>(TrainX[i],TrainY[i], difference,p,
-                                               Weights,Biases,learningRate,fBatchSize);
+                                               Weights,Biases,fTrainingSettings.learningRate,fTrainingSettings.batchSize);
 
     }
 
