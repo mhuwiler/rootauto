@@ -56,7 +56,7 @@ using namespace TMVA::DNN;
 
 namespace TMVA {
 
-struct TTrainingSettings {
+  struct TTrainingSettings {
     size_t batchSize;
     size_t testInterval;
     size_t convergenceSteps;
@@ -66,26 +66,18 @@ struct TTrainingSettings {
     Double_t weightDecay;
     Double_t corruption;
     bool multithreading;
-
-}
-
+  };
 
 class MethodDAE : public MethodBase {
 public:
   using Architecture_t = TReference<Double_t>;
   using Matrix_t = typename Architecture_t::Matrix_t;
-  using TDAE = TDAE<Architecture_t>;
 
 private:
-  using LayoutVector_t = std::vector<std::tuple>;
+  using LayoutVector_t = std::vector<Int_t>;
   using KeyValueVector_t = std::vector<std::map<TString, TString>>;
 
-  struct TTrainingSettings {
-    size_t batchSize;
-    Double_t learningRate;
-    Double_t corruptionLevel;
-  };
-
+  
   TDAE<Architecture_t>* net; 
   EInitialization fWeightInitialization; ///< The initialization method
   EOutputFunction fOutputFunction; ///< The output function for making the predictions
@@ -105,11 +97,6 @@ private:
   // the option handling methods
   void DeclareOptions();
   void ProcessOptions();
-
-  TDAE dae;
-
-  DNN::EInitialization fWeightInitialization;
-  DNN::EOutputFunction fOutputFunction;
 
   // Write and read weights from an XML file
   static inline void WriteMatrixXML(void *parent, const char *name,
