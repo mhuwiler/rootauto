@@ -38,8 +38,8 @@
 #include "TMVA/DNN/DAE/DenoiseAE.h"
 #include "TMVA/DNN/Net.h"
 #include "TMVA/DNN/Architectures/Reference.h"
-#include "TMVA/DNN/TestLogisticRegressionLayer.h"
-#include "TMVA/DNN/TestUtilsAE.h"
+//#include "TMVA/DNN/TestLogisticRegressionLayer.h"
+//#include "TMVA/DNN/TestUtilsAE.h"
 
 
 
@@ -474,11 +474,11 @@ void TMVA::MethodDAE::Train() {
 
   // For classification 
 
-  size_t totalRowsTrainOutput;
+  /*size_t totalRowsTrainOutput;
   size_t totalColumnsTrainOutput;
   std::vector<Matrix_t> TrainX;
   std::vector<Matrix_t> TrainY;  
-  for (unsigned int i=0; i<1/*eventCollectionTraining.size()*/; i++) 
+  for (unsigned int i=0; i<1*/ /*eventCollectionTraining.size()*/ /*; i++) 
   {
     TMVA::Event *event = eventCollectionTraining[i];
     const std::vector<Float_t> values = event->GetValues();
@@ -557,7 +557,7 @@ void TMVA::MethodDAE::Train() {
 
     }
 
-  }
+  }*/
 
 
 
