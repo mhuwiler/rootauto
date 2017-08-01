@@ -91,6 +91,8 @@ namespace TMVA {
       void SetInputTrees( TTree* signal, TTree* background, 
                           Double_t signalWeight=1.0, Double_t backgroundWeight=1.0) ;
 
+      //void set for only one tree 
+
       void AddSignalTree( TTree* signal,    Double_t weight=1.0, Types::ETreeType treetype = Types::kMaxTreeType );
       void AddSignalTree( TString datFileS, Double_t weight=1.0, Types::ETreeType treetype = Types::kMaxTreeType );
       void AddSignalTree( TTree* signal, Double_t weight, const TString& treetype );      
@@ -104,6 +106,8 @@ namespace TMVA {
 
       // ... depreciated, kept for backwards compatibility
       void SetBackgroundTree( TTree* background, Double_t weight=1.0 );
+
+      void AddUnsupervisedTree(TTree* tree, Double_t weights=1.0 ); 
 
       void SetSignalWeightExpression( const TString& variable );
       void SetBackgroundWeightExpression( const TString& variable );
