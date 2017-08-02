@@ -1,3 +1,31 @@
+// @(#)root/tmva $Id$
+// Author: Simon Pfreundschuh
+
+/**********************************************************************************
+ * Project: TMVA - a Root-integrated toolkit for multivariate data analysis       *
+ * Package: TMVA                                                                  *
+ * Class  : Parsing                                                               *
+ * Web    : http://tmva.sourceforge.net                                           *
+ *                                                                                *
+ * Description:                                                                   *
+ *      NeuralNetwork                                                             *
+ *                                                                                *
+ * Authors (alphabetical):                                                        *
+ * 		Marc Huwiler 		  <marc.huwiler@windowslive.com> - CERN, Switzerland  *
+ *      Peter Speckmayer      <peter.speckmayer@gmx.at>  - CERN, Switzerland      *
+ *      Simon Pfreundschuh    <s.pfreundschuh@gmail.com> - CERN, Switzerland	  *
+ *                                                                                *
+ * Copyright (c) 2005-2017:                                                       *
+ *      CERN, Switzerland                                                         *
+ *      U. of Victoria, Canada                                                    *
+ *      MPI-K Heidelberg, Germany                                                 *
+ *      U. of Bonn, Germany                                                       *
+ *                                                                                *
+ * Redistribution and use in source and binary forms, with or without             *
+ * modification, are permitted according to the terms listed in LICENSE           *
+ * (http://tmva.sourceforge.net/LICENSE)                                          *
+ **********************************************************************************/
+
 #ifndef PARSING
 #define PARSING
 

@@ -1,3 +1,37 @@
+// @(#)root/tmva $Id$
+// Author: Omar Zapata
+// Mentors: Lorenzo Moneta, Sergei Gleyzer
+//NOTE: Based on TMVA::Factory
+
+/**********************************************************************************
+ * Project: TMVA - a Root-integrated toolkit for multivariate data analysis       *
+ * Package: TMVA                                                                  *
+ * Class  : Parsing                                                            *
+ * Web    : http://tmva.sourceforge.net                                           *
+ *                                                                                *
+ * Description:                                                                   *
+ *      This is a class to load datasets into every booked method                 *
+ *                                                                                *
+ * Authors (alphabetical):                                                        *
+ *      Simon Pfreundschuh    <s.pfreundschuh@gmail.com> - CERN, Switzerland      *
+ *      Peter Speckmayer      <peter.speckmayer@gmx.ch>  - CERN, Switzerland      *
+ *      Marc Huwiler          <marc.huwiler@windowslive.com> - CERN, Switzerland  *
+ *                                                                                *
+ * Copyright (c) 2005-2017:                                                       *
+ *      CERN, Switzerland                                                         *
+ *                                                                                *
+ *                                                                                *
+ * Redistribution and use in source and binary forms, with or without             *
+ * modification, are permitted according to the terms listed in LICENSE           *
+ * (http://tmva.sourceforge.net/LICENSE)                                          *
+ **********************************************************************************/
+
+
+/*! \class TMVA::Parsing
+\ingroup TMVA
+
+*/
+
 #include "TMVA/Parsing.h"
 
 

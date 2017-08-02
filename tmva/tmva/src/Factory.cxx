@@ -353,8 +353,7 @@ TMVA::MethodBase* TMVA::Factory::BookMethod( TMVA::DataLoader *loader, TString t
    {
       if( loader->DefaultDataSetInfo().GetNClasses()==2
           && loader->DefaultDataSetInfo().GetClassInfo("Signal") != NULL
-          && loader->DefaultDataSetInfo().GetClassInfo("Background") != NULL
-         )
+          && loader->DefaultDataSetInfo().GetClassInfo("Background") != NULL )
       {
          fAnalysisType = Types::kClassification; // default is classification
       } 
@@ -374,7 +373,8 @@ TMVA::MethodBase* TMVA::Factory::BookMethod( TMVA::DataLoader *loader, TString t
 
   if(fMethodsMap.find(datasetname)!=fMethodsMap.end())
    {
-      if (GetMethod( datasetname,methodTitle ) != 0) {
+      if (GetMethod( datasetname,methodTitle ) != 0) 
+      {
        Log() << kFATAL << "Booking failed since method with title <"
         << methodTitle <<"> already exists "<< "in with DataSet Name <"<< loader->GetName()<<">  "
         << Endl;

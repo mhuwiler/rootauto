@@ -1,3 +1,25 @@
+// @(#)root/tmva $Id$
+// Author: Andreas Hoecker, Peter Speckmayer, Joerg Stelzer, Helge Voss
+
+/**********************************************************************************
+ * Project: TMVA - a Root-integrated toolkit for multivariate data analysis       *
+ * Package: TMVA                                                                  *
+ * Class  : ResultsUnsupervised                                                   *
+ * Web    : http://tmva.sourceforge.net                                           *
+ *                                                                                *
+ * Description:                                                                   *
+ *      Base-class for result-vectors                                             *
+ *                                                                                *
+ * Authors (alphabetical):                                                        *
+ *      Marc Huwiler       CERN Summer Student     <marc.huwiler@windowslive.com> *
+ *                                                                                *
+ * Copyright (c) 2017:                                                            *
+ *      CERN, Switzerland                                                         *
+ *                                                                                *
+ * Redistribution and use in source and binary forms, with or without             *
+ * modification, are permitted according to the terms listed in LICENSE           *
+ * (http://tmva.sourceforge.net/LICENSE)                                          *
+ **********************************************************************************/
 
 #ifndef ROOT_TMVA_ResultsUnsupervised
 #define ROOT_TMVA_ResultsUnsupervised 
