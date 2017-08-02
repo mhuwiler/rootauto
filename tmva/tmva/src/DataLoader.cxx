@@ -436,9 +436,9 @@ void TMVA::DataLoader::AddBackgroundTree( TTree* signal, Double_t weight, const 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AddUnsupervisedTree(TTree* tree, Double_t weights, Types::ETreeType treetype ) 
+void TMVA::DataLoader::AddUnsupervisedTree(TTree* tree, Double_t weights, Types::ETreeType treetype ) 
 {
-   AddTree( tree, "Unsupervised", weights, treetype); 
+   AddTree( tree, "Unsupervised", weights, TCut(""), treetype); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
