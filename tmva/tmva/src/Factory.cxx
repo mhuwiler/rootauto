@@ -349,17 +349,24 @@ TMVA::MethodBase* TMVA::Factory::BookMethod( TMVA::DataLoader *loader, TString t
 
    TString datasetname=loader->GetName();
 
-   if( fAnalysisType == Types::kNoAnalysisType ){
+   if( fAnalysisType == Types::kNoAnalysisType )
+   {
       if( loader->DefaultDataSetInfo().GetNClasses()==2
           && loader->DefaultDataSetInfo().GetClassInfo("Signal") != NULL
           && loader->DefaultDataSetInfo().GetClassInfo("Background") != NULL
-          ){
+         )
+      {
          fAnalysisType = Types::kClassification; // default is classification
-      } else if( loader->DefaultDataSetInfo().GetNClasses() >= 2 ){
+      } 
+      else if( loader->DefaultDataSetInfo().GetNClasses() >= 2 )
+      {
          fAnalysisType = Types::kMulticlass;    // if two classes, but not named "Signal" and "Background"
-      } else
+      } 
+      else
+      {
          Log() << kFATAL << "No analysis type for " << loader->DefaultDataSetInfo().GetNClasses() << " classes and "
                << loader->DefaultDataSetInfo().GetNTargets() << " regression targets." << Endl;
+      }
    }
 
    // booking via name; the names are translated into enums and the

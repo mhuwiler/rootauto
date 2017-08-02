@@ -107,7 +107,7 @@ namespace TMVA {
       // ... depreciated, kept for backwards compatibility
       void SetBackgroundTree( TTree* background, Double_t weight=1.0 );
 
-      void AddUnsupervisedTree(TTree* tree, Double_t weights=1.0 ); 
+      void AddUnsupervisedTree(TTree* tree, Double_t weights=1.0, Types::ETreeType treetype = Types::kMaxTreeType ); 
 
       void SetSignalWeightExpression( const TString& variable );
       void SetBackgroundWeightExpression( const TString& variable );

@@ -345,6 +345,7 @@ void TMVA::DataLoader::AddTree( TTree* tree, const TString& className, Double_t 
    if      (tmpTreeType.Contains( "train" ) && tmpTreeType.Contains( "test" )) tt = Types::kMaxTreeType;
    else if (tmpTreeType.Contains( "train" ))                                   tt = Types::kTraining;
    else if (tmpTreeType.Contains( "test" ))                                    tt = Types::kTesting;
+   //else if (tmpTreeType.Contains( "unsupervised"))                             tt = Types::kUnsupervised; 
    else {
       Log() << kFATAL << "<AddTree> cannot interpret tree type: \"" << treetype
             << "\" should be \"Training\" or \"Test\" or \"Training and Testing\"" << Endl;
@@ -431,6 +432,13 @@ void TMVA::DataLoader::AddBackgroundTree( TString datFileB, Double_t weight, Typ
 void TMVA::DataLoader::AddBackgroundTree( TTree* signal, Double_t weight, const TString& treetype )
 {
    AddTree( signal, "Background", weight, TCut(""), treetype );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void AddUnsupervisedTree(TTree* tree, Double_t weights, Types::ETreeType treetype ) 
+{
+   AddTree( tree, "Unsupervised", weights, treetype); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

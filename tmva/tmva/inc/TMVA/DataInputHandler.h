@@ -50,7 +50,7 @@ namespace TMVA {
 
    class MsgLogger;
    
-   class TreeInfo:public TObject {
+   class TreeInfo : public TObject {
 
    public:
 
