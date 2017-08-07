@@ -46,6 +46,11 @@ Linear interpolation class
 #include "TPrincipal.h"
 #include "TVectorD.h"
 #include "TVectorF.h"
+#include "TMatrix.h"
+#include "TMVA/DNN/Architectures/Reference.h"
+#include "TMVA/DNN/Architectures/Reference.h"
+#include "TMVA/DNN/Functions.h"
+
 
 #include <iostream>
 #include <iomanip>
@@ -79,8 +84,11 @@ TMVA::VariableDAETransform::~VariableDAETransform()
 /// since the number of classes it not known at construction, but
 /// only after the creation of the DataSet which might be later.
 
+//template <typename Architecture_t>
 void TMVA::VariableDAETransform::Initialize()
 {
+   //fEncoder(batchSize, visibleUnits, hiddenUnits, dropoutProb, activationFunc, weights, biases); 
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +101,7 @@ Bool_t TMVA::VariableDAETransform::PrepareTransformation (const std::vector<Even
 
    if (!IsEnabled() || IsCreated()) return kTRUE;
 
-   Log() << kINFO << "Preparing the Principle Component (PCA) transformation..." << Endl;
+   Log() << kINFO << "Preparing the Deep Autoencoder transformation..." << Endl;
 
    UInt_t inputSize = fGet.size();
 
@@ -210,6 +218,8 @@ void TMVA::VariableDAETransform::TrainOnExampleData( const std::vector< Event*>&
    CountVariableTypes( nvars, ntgts, nspcts );
    if( nvars>0  && ntgts>0 )
       Log() << kFATAL << "Variables and targets cannot be mixed in PCA transformation." << Endl;
+
+
 
    const Int_t inputSize = fGet.size();
 

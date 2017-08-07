@@ -41,17 +41,19 @@
 //#include "TPrincipal.h"
 
 #include "TMVA/VariableTransformBase.h"
+#include "TMVA/DNN/DAE2/CompressionLayer.h"
 
 namespace TMVA {
 
    class VariableDAETransform : public VariableTransformBase {
 
    public:
-  
+
       VariableDAETransform( DataSetInfo& dsi );
       virtual ~VariableDAETransform( void );
 
       void   Initialize();
+      //template <typename Architecture_t> void   Initialize();
       Bool_t PrepareTransformation (const std::vector<Event*>&);
 
       virtual const Event* Transform(const Event* const, Int_t cls ) const;
@@ -71,6 +73,8 @@ namespace TMVA {
       void TrainOnExampleData( const std::vector< Event*>& );
       void X2P( std::vector<Float_t>&, const std::vector<Float_t>&, Int_t cls ) const;
       void P2X( std::vector<Float_t>&, const std::vector<Float_t>&, Int_t cls ) const;
+
+      TCompressionLayer fEncoder; 
 
       // store relevant parts of PCA locally
       std::vector<TVectorD*> fMeanValues;   // mean values
