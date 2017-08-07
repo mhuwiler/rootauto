@@ -38,7 +38,7 @@
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
-#include "TPrincipal.h"
+//#include "TPrincipal.h"
 
 #include "TMVA/VariableTransformBase.h"
 
@@ -48,8 +48,8 @@ namespace TMVA {
 
    public:
   
-      VariablePCATransform( DataSetInfo& dsi );
-      virtual ~VariablePCATransform( void );
+      VariableDAETransform( DataSetInfo& dsi );
+      virtual ~VariableDAETransform( void );
 
       void   Initialize();
       Bool_t PrepareTransformation (const std::vector<Event*>&);
@@ -68,7 +68,7 @@ namespace TMVA {
 
    private:
 
-      void CalculatePrincipalComponents( const std::vector< Event*>& );
+      void TrainOnExampleData( const std::vector< Event*>& );
       void X2P( std::vector<Float_t>&, const std::vector<Float_t>&, Int_t cls ) const;
       void P2X( std::vector<Float_t>&, const std::vector<Float_t>&, Int_t cls ) const;
 
@@ -76,7 +76,7 @@ namespace TMVA {
       std::vector<TVectorD*> fMeanValues;   // mean values
       std::vector<TMatrixD*> fEigenVectors; // eigenvectors
 
-      ClassDef(VariablePCATransform,0); // Variable transformation: Principal Value Composition
+      ClassDef(VariableDAETransform,0); // Variable transformation: Principal Value Composition
    };
 
 } // namespace TMVA
